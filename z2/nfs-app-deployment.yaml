@@ -1,33 +1,26 @@
-[Unit]
-Description=NFS server and services
-DefaultDependencies=no
-Requires=network.target proc-fs-nfsd.mount
-Requires=nfs-mountd.service
-Wants=rpcbind.socket network-online.target
-Wants=rpc-statd.service nfs-idmapd.service
-Wants=rpc-statd-notify.service
-Wants=nfsdcld.service
-
-After=network-online.target local-fs.target
-After=proc-fs-nfsd.mount rpcbind.socket nfs-mountd.service
-After=nfs-idmapd.service rpc-statd.service
-After=nfsdcld.service
-Before=rpc-statd-notify.service
-
-# GSS services dependencies and ordering
-Wants=auth-rpcgss-module.service rpc-svcgssd.service
-After=rpc-gssd.service gssproxy.service rpc-svcgssd.service
-
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-ExecStartPre=-/usr/sbin/exportfs -r
-ExecStart=/usr/sbin/rpc.nfsd
-ExecStop=/usr/sbin/rpc.nfsd 0
-ExecStopPost=/usr/sbin/exportfs -au
-ExecStopPost=/usr/sbin/exportfs -f
-
-ExecReload=-/usr/sbin/exportfs -r
-
-[Install]
-WantedBy=multi-user.target
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nfs-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfs-app
+  template:
+    metadata:
+      labels:
+        app: nfs-app
+    spec:
+      containers:
+      - name: multitool
+        image: wbitt/network-multitool:latest
+        command: ["/bin/sh", "-c"]
+        args: ["echo 'Initial content' > /mnt/nfs/data.txt && tail -f /dev/null"]
+        volumeMounts:
+        - name: nfs-storage
+          mountPath: /mnt/nfs
+      volumes:
+      - name: nfs-storage
+        persistentVolumeClaim:
+          claimName: nfs-pvc
