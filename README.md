@@ -21,3 +21,8 @@ PV только управляет доступом к хранилищу в Kub
 Данные остаются в указанной директории
 
 ## Задание 2
+
+![image](https://github.com/user-attachments/assets/c78a55e9-a484-4da7-be24-453acb3f2ec4)
+
+
+![image](https://github.com/user-attachments/assets/95a95a8e-0085-4d7c-ad7f-4724e380a2e5)
